@@ -43,6 +43,8 @@ protected:
 public slots :
 	void scaleChanged(double);
 	void alphaChanged(double);
+	void setStartPoint();
+	void setEndPoint();
 	void setSizePen(int);
 	void clearMask();
 	void saveMask();
@@ -72,10 +74,14 @@ private:
 	int              _pen_size         ;
 	bool             _button_is_pressed;
 	QSize _act_im_size;
+	// Start and end point
+	QPoint           _start_point      ;
+	QPoint           _end_point        ;
 
 private slots:
 	void adjustScrollBars();
-
+	void drawLine();
+	QVector<QPoint> bresenham(QPoint _start_point, QPoint _end_point);
 };
 
 

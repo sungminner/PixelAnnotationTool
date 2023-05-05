@@ -29,6 +29,8 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     image_canvas = NULL;
     _isLoadingNewLabels = false;
 	save_action = new QAction(tr("&Save current image"), this);
+	set_start_point = new QAction(tr("&Set start point"), this);
+    set_end_point = new QAction(tr("&Set end point"), this);
     copy_mask_action = new QAction(tr("&Copy Mask"), this);
     paste_mask_action = new QAction(tr("&Paste Mask"), this);
     clear_mask_action = new QAction(tr("&Clear Mask mask"), this);
@@ -41,6 +43,8 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
 	undo_action->setShortcuts(QKeySequence::Undo);
 	redo_action->setShortcuts(QKeySequence::Redo);
 	save_action->setShortcut(Qt::CTRL + Qt::Key_S);
+	set_start_point->setShortcut(Qt::CTRL + Qt::Key_A);
+	set_end_point->setShortcut(Qt::CTRL + Qt::Key_D);
     swap_action->setShortcut(Qt::CTRL + Qt::Key_Space);
     copy_mask_action->setShortcut(Qt::CTRL + Qt::Key_C);
     paste_mask_action->setShortcut(Qt::CTRL + Qt::Key_V);
@@ -59,6 +63,8 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
     menuEdit->addAction(paste_mask_action);
     menuEdit->addAction(clear_mask_action);
     menuEdit->addAction(swap_action);
+    menuEdit->addAction(set_start_point);
+    menuEdit->addAction(set_end_point);
     menuEdit->addAction(next_file_action);
     menuEdit->addAction(previous_file_action);
 
@@ -66,6 +72,8 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
 
 	connect(button_watershed      , SIGNAL(released())                        , this, SLOT(runWatershed()  ));
     connect(swap_action           , SIGNAL(triggered())                       , this, SLOT(swapView()      ));
+    connect(set_start_point       , SIGNAL(triggered())                       , this, SLOT(setStartPoint() ));
+    connect(set_end_point         , SIGNAL(triggered())                       , this, SLOT(setEndPoint()   ));
 	connect(actionOpen_config_file, SIGNAL(triggered())                       , this, SLOT(loadConfigFile()));
 	connect(actionSave_config_file, SIGNAL(triggered())                       , this, SLOT(saveConfigFile()));
     connect(close_tab_action      , SIGNAL(triggered())                       , this, SLOT(closeCurrentTab()));
@@ -295,6 +303,8 @@ void MainWindow::updateConnect(const ImageCanvas * ic) {
 	connect(undo_action, SIGNAL(triggered()), ic, SLOT(undo()));
 	connect(redo_action, SIGNAL(triggered()), ic, SLOT(redo()));
 	connect(save_action, SIGNAL(triggered()), ic, SLOT(saveMask()));
+	connect(set_start_point, SIGNAL(triggered()), ic, SLOT(setStartPoint()));
+    connect(set_end_point, SIGNAL(triggered()), ic, SLOT(setEndPoint()));
     connect(checkbox_border_ws, SIGNAL(clicked()), this, SLOT(runWatershed()));
 }
 
@@ -309,6 +319,8 @@ void MainWindow::allDisconnnect(const ImageCanvas * ic) {
     disconnect(undo_action, SIGNAL(triggered()), ic, SLOT(undo()));
     disconnect(redo_action, SIGNAL(triggered()), ic, SLOT(redo()));
     disconnect(save_action, SIGNAL(triggered()), ic, SLOT(saveMask()));
+	disconnect(set_start_point, SIGNAL(triggered()), ic, SLOT(setStartPoint()));
+    disconnect(set_end_point, SIGNAL(triggered()), ic, SLOT(setEndPoint()));
     disconnect(checkbox_border_ws, SIGNAL(clicked()), this, SLOT(runWatershed()));
 }
 

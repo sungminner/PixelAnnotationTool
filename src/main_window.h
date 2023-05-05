@@ -54,6 +54,8 @@ public:
 	Name2Labels      labels       ;
 	Id2Labels        id_labels    ;
 	QAction        * save_action  ;
+	QAction        * set_start_point;
+    QAction        * set_end_point;
     QAction        * copy_mask_action;
     QAction        * paste_mask_action;
     QAction        * clear_mask_action;

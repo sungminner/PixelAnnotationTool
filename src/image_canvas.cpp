@@ -27,6 +27,10 @@ ImageCanvas::ImageCanvas(MainWindow *ui) :
     _scroll_parent->setBackgroundRole(QPalette::Dark);
     _scroll_parent->setWidget(this);
 
+	//set start and end point to 0
+	_start_point = QPoint(0, 0);
+	_end_point = QPoint(0, 0);
+
 }
 
 ImageCanvas::~ImageCanvas() {
@@ -94,6 +98,21 @@ void ImageCanvas::saveMask() {
     _undo_list.clear();
     _undo_index = 0;
     _ui->setStarAtNameOfTab(false);
+}
+
+// Set start point of the line
+void ImageCanvas::setStartPoint() {
+	_start_point = _mouse_pos;
+	_ui->statusbar->showMessage("Start point set");
+}
+
+// Set end point of the line
+void ImageCanvas::setEndPoint() {
+	_end_point = _mouse_pos;
+	_ui->statusbar->showMessage("End point set");
+	drawLine();
+	emit(_ui->button_watershed->released());
+	_start_point = _mouse_pos;
 }
 
 void ImageCanvas::scaleChanged(double scale) {
@@ -174,6 +193,46 @@ void ImageCanvas::paintEvent(QPaintEvent *event) {
 		painter.drawEllipse(_mouse_pos.x() / _scale - _pen_size / 2, _mouse_pos.y() / _scale - _pen_size / 2, _pen_size, _pen_size);
 		painter.end();
 	}
+}
+
+void ImageCanvas::drawLine() {
+	// Using Bresenham's algorithm, return a list of points between two points _start_point and _end_point
+	QVector<QPoint> points = bresenham(_start_point, _end_point);
+	for (int i = 0; i < points.size(); i++) {
+		if (_pen_size > 0) {
+			int x = points[i].x() / _scale - _pen_size / 2;
+			int y = points[i].y() / _scale - _pen_size / 2;
+			_mask.drawFillCircle(x, y, _pen_size, _color);
+		} else {
+			int x = (points[i].x()+0.5) / _scale ;
+			int y = (points[i].y()+0.5) / _scale ;
+			_mask.drawPixel(x, y, _color);
+		}
+	}
+	repaint();
+}
+
+//Bresenham's line algorithm
+QVector<QPoint> ImageCanvas::bresenham(QPoint _start_point, QPoint _end_point) {
+	QVector<QPoint> points;
+	int x0 = _start_point.x();
+	int y0 = _start_point.y();
+	int x1 = _end_point.x();
+	int y1 = _end_point.y();
+	int dx = abs(x1 - x0);
+	int dy = abs(y1 - y0);
+	int sx = (x0 < x1) ? 1 : -1;
+	int sy = (y0 < y1) ? 1 : -1;
+	int err = dx - dy;
+
+	while (true) {
+		points.push_back(QPoint(x0, y0));
+		if ((x0 == x1) && (y0 == y1)) break;
+		int e2 = 2 * err;
+		if (e2 > -dy) { err -= dy; x0 += sx; }
+		if (e2 < dx) { err += dx; y0 += sy; }
+	}
+	return points;
 }
 
 void ImageCanvas::mouseMoveEvent(QMouseEvent * e) {
