@@ -196,7 +196,6 @@ void ImageCanvas::paintEvent(QPaintEvent *event) {
 }
 
 void ImageCanvas::drawLine() {
-	// Using Bresenham's algorithm, return a list of points between two points _start_point and _end_point
 	QVector<QPoint> points = bresenham(_start_point, _end_point);
 	for (int i = 0; i < points.size(); i++) {
 		if (_pen_size > 0) {
@@ -212,8 +211,9 @@ void ImageCanvas::drawLine() {
 	repaint();
 }
 
-//Bresenham's line algorithm
 QVector<QPoint> ImageCanvas::bresenham(QPoint _start_point, QPoint _end_point) {
+	// Using Bresenham's line algorithm, returns a list of
+	// points between two points _start_point and _end_point
 	QVector<QPoint> points;
 	int x0 = _start_point.x();
 	int y0 = _start_point.y();
